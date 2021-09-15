@@ -8501,7 +8501,7 @@ exports.withCustomRequest = withCustomRequest;
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 
-const VERSION = "2.16.0";
+const VERSION = "2.16.2";
 
 function ownKeys(object, enumerableOnly) {
   var keys = Object.keys(object);
@@ -9930,7 +9930,7 @@ const Endpoints = {
   }
 };
 
-const VERSION = "5.10.0";
+const VERSION = "5.10.3";
 
 function endpointsToMethods(octokit, endpointsMap) {
   const newMethods = {};
@@ -14725,10 +14725,10 @@ module.exports = function (config) {
   })
 
   return Q.all([
-    readFile(__nccwpck_require__.ab + "template1.hbs", 'utf-8'),
-    readFile(__nccwpck_require__.ab + "header1.hbs", 'utf-8'),
-    readFile(__nccwpck_require__.ab + "commit1.hbs", 'utf-8'),
-    readFile(__nccwpck_require__.ab + "footer.hbs", 'utf-8')
+    readFile(__nccwpck_require__.ab + "template2.hbs", 'utf-8'),
+    readFile(__nccwpck_require__.ab + "header2.hbs", 'utf-8'),
+    readFile(__nccwpck_require__.ab + "commit2.hbs", 'utf-8'),
+    readFile(__nccwpck_require__.ab + "footer1.hbs", 'utf-8')
   ])
     .spread((template, header, commit, footer) => {
       const writerOpts = getWriterOpts(config)
@@ -14947,10 +14947,10 @@ function conventionalChangelogWriterInit (context, options) {
     includeDetails: false,
     ignoreReverted: true,
     doFlush: true,
-    mainTemplate: readFileSync(__nccwpck_require__.ab + "template2.hbs", 'utf-8'),
-    headerPartial: readFileSync(__nccwpck_require__.ab + "header2.hbs", 'utf-8'),
-    commitPartial: readFileSync(__nccwpck_require__.ab + "commit2.hbs", 'utf-8'),
-    footerPartial: readFileSync(__nccwpck_require__.ab + "footer1.hbs", 'utf-8')
+    mainTemplate: readFileSync(__nccwpck_require__.ab + "template1.hbs", 'utf-8'),
+    headerPartial: readFileSync(__nccwpck_require__.ab + "header1.hbs", 'utf-8'),
+    commitPartial: readFileSync(__nccwpck_require__.ab + "commit1.hbs", 'utf-8'),
+    footerPartial: readFileSync(__nccwpck_require__.ab + "footer.hbs", 'utf-8')
   }, options)
 
   if ((!_.isFunction(options.transform) && _.isObject(options.transform)) || _.isUndefined(options.transform)) {
@@ -63742,6 +63742,78 @@ exports.ReleasePR = ReleasePR;
 
 /***/ }),
 
+/***/ 95678:
+/***/ ((__unused_webpack_module, exports, __nccwpck_require__) => {
+
+"use strict";
+
+// Copyright 2021 Google LLC
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//      http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.Dart = void 0;
+const release_pr_1 = __nccwpck_require__(86786);
+// Generic
+const changelog_1 = __nccwpck_require__(3325);
+const yaml = __nccwpck_require__(31882);
+// pubspec
+const pubspec_yaml_1 = __nccwpck_require__(99637);
+class Dart extends release_pr_1.ReleasePR {
+    async buildUpdates(changelogEntry, candidate, packageName) {
+        const updates = [];
+        updates.push(new changelog_1.Changelog({
+            path: this.addPath(this.changelogPath),
+            changelogEntry,
+            version: candidate.version,
+            packageName: packageName.name,
+        }));
+        updates.push(new pubspec_yaml_1.PubspecYaml({
+            path: this.addPath('pubspec.yaml'),
+            changelogEntry,
+            version: candidate.version,
+            packageName: packageName.name,
+        }));
+        return updates;
+    }
+    async getPackageName() {
+        var _a;
+        if (this._packageName === undefined) {
+            const pubspecYmlContents = await this.getPubspecYmlContents();
+            const pubspec = yaml.load(pubspecYmlContents.parsedContent, { json: true });
+            if (typeof pubspec === 'object') {
+                this.packageName = this._packageName = (_a = pubspec.name) !== null && _a !== void 0 ? _a : this.packageName;
+            }
+            else {
+                this._packageName = this.packageName;
+            }
+        }
+        return {
+            name: this.packageName,
+            getComponent: () => this.packageName,
+        };
+    }
+    async getPubspecYmlContents() {
+        if (!this.pubspecYmlContents) {
+            this.pubspecYmlContents = await this.gh.getFileContents(this.addPath('pubspec.yaml'));
+        }
+        return this.pubspecYmlContents;
+    }
+}
+exports.Dart = Dart;
+//# sourceMappingURL=dart.js.map
+
+/***/ }),
+
 /***/ 54737:
 /***/ ((__unused_webpack_module, exports, __nccwpck_require__) => {
 
@@ -64114,6 +64186,7 @@ const rust_1 = __nccwpck_require__(18109);
 const ocaml_1 = __nccwpck_require__(26571);
 const helm_1 = __nccwpck_require__(42474);
 const elixir_1 = __nccwpck_require__(54737);
+const dart_1 = __nccwpck_require__(95678);
 const releasers = {
     go: go_1.Go,
     'go-yoshi': go_yoshi_1.GoYoshi,
@@ -64133,6 +64206,7 @@ const releasers = {
     'terraform-module': terraform_module_1.TerraformModule,
     helm: helm_1.Helm,
     elixir: elixir_1.Elixir,
+    dart: dart_1.Dart,
 };
 function getReleasers() {
     return releasers;
@@ -65397,6 +65471,7 @@ class Python extends release_pr_1.ReleasePR {
         }));
         const parsedPyProject = await this.getPyProject();
         const pyProject = (parsedPyProject === null || parsedPyProject === void 0 ? void 0 : parsedPyProject.project) || ((_a = parsedPyProject === null || parsedPyProject === void 0 ? void 0 : parsedPyProject.tool) === null || _a === void 0 ? void 0 : _a.poetry);
+        let projectName = packageName.name;
         if (pyProject) {
             updates.push(new pyproject_toml_1.PyProjectToml({
                 path: this.addPath('pyproject.toml'),
@@ -65404,20 +65479,19 @@ class Python extends release_pr_1.ReleasePR {
                 version: candidate.version,
                 packageName: packageName.name,
             }));
-            if (pyProject.name) {
-                updates.push(new python_file_with_version_1.PythonFileWithVersion({
-                    path: this.addPath(`${pyProject.name}/__init__.py`),
-                    changelogEntry,
-                    version: candidate.version,
-                    packageName: packageName.name,
-                }));
-            }
+            projectName = pyProject.name;
         }
         else {
             logger_1.logger.warn(parsedPyProject
                 ? 'invalid pyproject.toml'
                 : `file ${chalk.green('pyproject.toml')} did not exist`);
         }
+        updates.push(new python_file_with_version_1.PythonFileWithVersion({
+            path: this.addPath(`${projectName}/__init__.py`),
+            changelogEntry,
+            version: candidate.version,
+            packageName: packageName.name,
+        }));
         // There should be only one version.py, but foreach in case that is incorrect
         const versionPyFilesSearch = this.gh.findFilesByFilename('version.py', this.path);
         const versionPyFiles = await versionPyFilesSearch;
@@ -65633,6 +65707,9 @@ class Ruby extends release_pr_1.ReleasePR {
     }
     async buildUpdates(changelogEntry, candidate, packageName) {
         const updates = [];
+        const versionFile = this.versionFile
+            ? this.versionFile
+            : `lib/${packageName.name.replace(/-/g, '/')}/version.rb`;
         updates.push(new changelog_1.Changelog({
             path: this.addPath(this.changelogPath),
             changelogEntry,
@@ -65640,7 +65717,7 @@ class Ruby extends release_pr_1.ReleasePR {
             packageName: packageName.name,
         }));
         updates.push(new version_rb_1.VersionRB({
-            path: this.addPath(this.versionFile),
+            path: this.addPath(versionFile),
             changelogEntry,
             version: candidate.version,
             packageName: packageName.name,
@@ -66692,6 +66769,51 @@ class PHPManifest {
 }
 exports.PHPManifest = PHPManifest;
 //# sourceMappingURL=php-manifest.js.map
+
+/***/ }),
+
+/***/ 99637:
+/***/ ((__unused_webpack_module, exports, __nccwpck_require__) => {
+
+"use strict";
+
+// Copyright 2021 Google LLC
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//      http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.PubspecYaml = void 0;
+const logger_1 = __nccwpck_require__(68809);
+class PubspecYaml {
+    constructor(options) {
+        this.create = false;
+        this.path = options.path;
+        this.changelogEntry = options.changelogEntry;
+        this.version = options.version;
+        this.packageName = options.packageName;
+        this.contents = options.contents;
+    }
+    updateContent(content) {
+        const oldVersion = content.match(/version: ([0-9\.]+)\+([0-9]+)/);
+        var buildNumber = '1';
+        if (oldVersion) {
+            buildNumber = `${oldVersion[2]}`;
+            logger_1.logger.info(`updating ${this.path} from ${oldVersion[1]}+${buildNumber} to ${this.version}+${buildNumber}`);
+        }
+        return content.replace(/version: ([0-9\.]+)\+([0-9]+)/, `version: ${this.version}+${buildNumber}`);
+    }
+}
+exports.PubspecYaml = PubspecYaml;
+//# sourceMappingURL=pubspec-yaml.js.map
 
 /***/ }),
 
@@ -86182,7 +86304,7 @@ module.exports = JSON.parse("[\"assert\",\"buffer\",\"child_process\",\"cluster\
 /***/ ((module) => {
 
 "use strict";
-module.exports = {"i8":"11.23.0"};
+module.exports = {"i8":"11.24.1"};
 
 /***/ }),
 
@@ -86190,7 +86312,7 @@ module.exports = {"i8":"11.23.0"};
 /***/ ((module) => {
 
 "use strict";
-module.exports = JSON.parse("{\"name\":\"strong-log-transformer\",\"version\":\"2.1.0\",\"description\":\"Stream transformer that prefixes lines with timestamps and other things.\",\"author\":\"Ryan Graham <ryan@strongloop.com>\",\"license\":\"Apache-2.0\",\"repository\":{\"type\":\"git\",\"url\":\"git://github.com/strongloop/strong-log-transformer\"},\"keywords\":[\"logging\",\"streams\"],\"bugs\":{\"url\":\"https://github.com/strongloop/strong-log-transformer/issues\"},\"homepage\":\"https://github.com/strongloop/strong-log-transformer\",\"directories\":{\"test\":\"test\"},\"bin\":{\"sl-log-transformer\":\"bin/sl-log-transformer.js\"},\"main\":\"index.js\",\"scripts\":{\"test\":\"tap --100 test/test-*\"},\"dependencies\":{\"duplexer\":\"^0.1.1\",\"minimist\":\"^1.2.0\",\"through\":\"^2.3.4\"},\"devDependencies\":{\"tap\":\"^12.0.1\"},\"engines\":{\"node\":\">=4\"},\"_resolved\":\"https://registry.npmjs.org/strong-log-transformer/-/strong-log-transformer-2.1.0.tgz\",\"_integrity\":\"sha512-B3Hgul+z0L9a236FAUC9iZsL+nVHgoCJnqCbN588DjYxvGXaXaaFbfmQ/JhvKjZwsOukuR72XbHv71Qkug0HxA==\",\"_from\":\"strong-log-transformer@2.1.0\"}");
+module.exports = JSON.parse("{\"_from\":\"strong-log-transformer@^2.1.0\",\"_id\":\"strong-log-transformer@2.1.0\",\"_inBundle\":false,\"_integrity\":\"sha512-B3Hgul+z0L9a236FAUC9iZsL+nVHgoCJnqCbN588DjYxvGXaXaaFbfmQ/JhvKjZwsOukuR72XbHv71Qkug0HxA==\",\"_location\":\"/strong-log-transformer\",\"_phantomChildren\":{},\"_requested\":{\"type\":\"range\",\"registry\":true,\"raw\":\"strong-log-transformer@^2.1.0\",\"name\":\"strong-log-transformer\",\"escapedName\":\"strong-log-transformer\",\"rawSpec\":\"^2.1.0\",\"saveSpec\":null,\"fetchSpec\":\"^2.1.0\"},\"_requiredBy\":[\"/@lerna/child-process\"],\"_resolved\":\"https://registry.npmjs.org/strong-log-transformer/-/strong-log-transformer-2.1.0.tgz\",\"_shasum\":\"0f5ed78d325e0421ac6f90f7f10e691d6ae3ae10\",\"_spec\":\"strong-log-transformer@^2.1.0\",\"_where\":\"/Users/core/Documents/project/release-please-action/node_modules/@lerna/child-process\",\"author\":{\"name\":\"Ryan Graham\",\"email\":\"ryan@strongloop.com\"},\"bin\":{\"sl-log-transformer\":\"bin/sl-log-transformer.js\"},\"bugs\":{\"url\":\"https://github.com/strongloop/strong-log-transformer/issues\"},\"bundleDependencies\":false,\"dependencies\":{\"duplexer\":\"^0.1.1\",\"minimist\":\"^1.2.0\",\"through\":\"^2.3.4\"},\"deprecated\":false,\"description\":\"Stream transformer that prefixes lines with timestamps and other things.\",\"devDependencies\":{\"tap\":\"^12.0.1\"},\"directories\":{\"test\":\"test\"},\"engines\":{\"node\":\">=4\"},\"homepage\":\"https://github.com/strongloop/strong-log-transformer\",\"keywords\":[\"logging\",\"streams\"],\"license\":\"Apache-2.0\",\"main\":\"index.js\",\"name\":\"strong-log-transformer\",\"repository\":{\"type\":\"git\",\"url\":\"git://github.com/strongloop/strong-log-transformer.git\"},\"scripts\":{\"test\":\"tap --100 test/test-*\"},\"version\":\"2.1.0\"}");
 
 /***/ }),
 
